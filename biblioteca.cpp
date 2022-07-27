@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 struct Usuario{
     int ocupado = 0;
     char nome[200];
@@ -7,21 +8,45 @@ struct Usuario{
 
 void cadastrar_usuario(Usuario usuarios[])
 {
+    bool ja_tem = false;
+    long long cpf_cadastrar;
     for (int i = 0; i < 100; i++)
     {
         if (usuarios[i].ocupado == 0)
         {
-            usuarios[i].ocupado = 1;
-            printf("CPF: ");
-            scanf("%lld", &usuarios[i].cpf);
-            printf("Nome: ");
-            getchar();
-            gets(usuarios[i].nome);
+            for (int j = 0; j < 1; )
+            {
+                printf("CPF: ");
+                scanf("%lld", &cpf_cadastrar);
+                
+                for (int k = 0; k < 100; k++)
+                {
+                    if (cpf_cadastrar == usuarios[k].cpf && usuarios[k].ocupado == 1)
+                        ja_tem = true;
+                }
+                
+                if ((cpf_cadastrar >= 10000000000 && cpf_cadastrar <= 99999999999) && ja_tem == false)
+                    usuarios[i].cpf = cpf_cadastrar;
+                    j++;
+            }
             
+            for (int j = 0; j < 1; )
+            {
+                printf("Nome: ");
+                getchar();
+                gets(usuarios[i].nome);
+                
+                if (strlen(usuarios[i].nome) >= 4)
+                    j++;
+            }
+            usuarios[i].ocupado = 1;
+
             break;
         }
     }
 }
+
+
 
 void listar_usuarios(Usuario usuarios[])
 {
