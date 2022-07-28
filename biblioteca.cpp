@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 struct Usuario{
-    int ocupado = 0;
+    int ocupado = 0;    //todos começam com ocupado = 0. se for 1, significa que há um usuário cadastrado naquela posição. se for 0 significa que aquela posição pode ser usada para cadastrar outro usuário
     char nome[200];
     long long cpf;
 };
@@ -10,25 +10,36 @@ void cadastrar_usuario(Usuario usuarios[])
 {
     bool ja_tem = false;
     long long cpf_cadastrar;
+
     for (int i = 0; i < 100; i++)
     {
         if (usuarios[i].ocupado == 0)
         {
             for (int j = 0; j < 1; )
             {
+                ja_tem = false;
                 printf("CPF: ");
                 scanf("%lld", &cpf_cadastrar);
                 
-                for (int k = 0; k < 100; k++)
+                for (int k = 0; k < 100; k++)   //verificar se já há algum usuário cadastrado com mesmo cpf
                 {
-                    if (cpf_cadastrar == usuarios[k].cpf && usuarios[k].ocupado == 1)
-                        ja_tem = true;
+                    if (usuarios[k].ocupado == 1)   //se a posição for de um usuário cadastrado
+                    {
+                        if (cpf_cadastrar == usuarios[k].cpf)   //se os cpfs forem os mesmos
+                            ja_tem = true;  //já tem esse cpf cadastrado
+                            
+                    }
+                    
+                }
+                if ((cpf_cadastrar >= 10000000000 && cpf_cadastrar <= 99999999999) && ja_tem == false)  //se cpf tem 11 digitos e não há outra pesspa com mesmo cpf
+                {
+                    usuarios[i].cpf = cpf_cadastrar;    //atribuir o cpf à pessoa
+                    j++;    //sair do loop cpf
+                    //se não, pede o cpf de novo
                 }
                 
-                if ((cpf_cadastrar >= 10000000000 && cpf_cadastrar <= 99999999999) && ja_tem == false)
-                    usuarios[i].cpf = cpf_cadastrar;
-                    j++;
             }
+            //loop acima não está funcionando. ele tem que pedir para o usuário colocar o cpf novamente se o cpf não tiver 11 dígitos, ou se já houver outra pessoa com mesmo cpf
             
             for (int j = 0; j < 1; )
             {
@@ -36,12 +47,16 @@ void cadastrar_usuario(Usuario usuarios[])
                 getchar();
                 gets(usuarios[i].nome);
                 
-                if (strlen(usuarios[i].nome) >= 4)
-                    j++;
+                if (strlen(usuarios[i].nome) >= 4)  //se o tamanho da string for maior ou igual a 4
+                    j++;    //sair do loop nome
+                //se não, pede o nome novamente
+                
             }
-            usuarios[i].ocupado = 1;
+            //se colocar um nome com menos de 3 letras, o programa pede para colocar o nome novamente, mas quando os usuários são listados a primeira letra do nome não aparece
 
-            break;
+            usuarios[i].ocupado = 1;    //caso passe pelas condições acima, a posição passa a ser ocupada pelo usuário novo.
+
+            break;  //e volta para o menu_cadastro_usuario
         }
     }
 }
