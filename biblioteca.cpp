@@ -233,7 +233,7 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
             for (int j = 0; j < 1;)
             {
                 char temp[1000];
-                getchar();
+                printf("\nNome correto\n");
                 printf("Titulo: ");
                 gets(temp);
                 strupr(temp);
@@ -329,6 +329,54 @@ void listar_livros(Usuario usuarios[], Livro livros[])
     }
 }
 
+void emprestar_livro(Usuario usuarios[], Livro livros[])
+{
+    long long cpf_emprestimo;
+    int codigo_emprestimo;
+    bool tem = false;
+    for (int i = 0; i < 1; )
+    {
+        printf("CPF do usuario: ");
+        scanf("%lld", &cpf_emprestimo);
+
+        for (int j = 0; j < 100; j++)
+        {
+            if (usuarios[j].ocupado == 1)
+            {
+                if (usuarios[j].ocupado == cpf_emprestimo)
+                {
+                    tem = true;
+                }
+            }
+        }
+        if (tem)
+            i++;
+        else
+            printf("\nErro: CPF nao consta no sistema.");
+    }
+
+    // for (int i = 0; i < 1; i++)
+    // {
+    //     printf("Codigo do livro: ");
+    //     scanf("%d", &codigo_emprestimo);
+
+    //     for (int j = 0; j < 100; j++)
+    //     {
+    //         if (usuarios[j].ocupado == 1)
+    //         {
+    //             if (usuarios[j].ocupado == cpf_emprestimo)
+    //             {
+    //                 tem = true;
+    //             }
+    //         }
+    //     }
+    //     if (tem)
+    //         i++;
+    //     else
+    //         printf("\nErro: CPF nao consta no sistema.");
+    // }
+}
+
 void menu_cadastro_usuarios(Usuario usuarios[], Livro livros[])
 {
     while (true)
@@ -375,7 +423,7 @@ void menu_cadastro_livros(Usuario usuarios[], Livro livros[])
     }
 }
 
-void menu_cadastro_emprestimo_devolucao()
+void menu_cadastro_emprestimo_devolucao(Usuario usuarios[], Livro livros[])
 {
     while (true)
     {
@@ -387,8 +435,8 @@ void menu_cadastro_emprestimo_devolucao()
         printf("\n4-Voltar\n");
         scanf("%d", &entrada);
 
-        //  if (entrada == 1)
-        //      emprestar_livro();
+        if (entrada == 1)
+            emprestar_livro(usuarios, livros);
         //  if (entrada == 2)
         //      devolve_livro();
         //  if (entrada == 3)
@@ -423,7 +471,7 @@ void menu_principal(Usuario usuarios[], Livro livros[])
 
         if (entrada == 3)
         {
-            menu_cadastro_emprestimo_devolucao();
+            menu_cadastro_emprestimo_devolucao(usuarios, livros);
         }
 
         if (entrada == 4)
