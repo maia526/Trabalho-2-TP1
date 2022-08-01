@@ -282,10 +282,9 @@ void excluir_livro(Usuario usuarios[], Livro livros[])
         {
             for (int i = 0; i < 100; i++)
             {
-                // esse tem.emprestimo é para verificar se o usuario tem algum emprestimo em andamento. se tiver não pode deletar. caso dê problema com isso mais para a frente é aqui que tem que ver provavelmente
                 if (emprestado == false)
-                    if (usuarios[i].tem_emprestimo == 0)
-                        usuarios[i].ocupado = 0;
+                    if (livros[i].emprestado == 0)
+                        livros[i].ocupado = 0;
                 k++;
                 if (emprestado == true)
                     printf("\nLivro esta emprestado, nao e possivel exclui-lo.\n");
@@ -313,9 +312,9 @@ void listar_livros(Usuario usuarios[], Livro livros[])
         if (livros[i].ocupado == 1)
         {
             printf("\n%s\n", livros[i].titulo);
-            printf(" %s %s", livros[i].nome, livros[i].sobrenome);
+            printf("%s %s", livros[i].nome, livros[i].sobrenome);
             printf("\n%d\n", livros[i].codigo);
-            printf("\n%d", livros[i].ano);
+            printf("%d\n", livros[i].ano);
         }
     }
 }
