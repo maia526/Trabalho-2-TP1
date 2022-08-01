@@ -6,15 +6,13 @@ struct Usuario
     int repetiu_nome = 0;
     int tem_emprestimo = 0;
     char nome_livro[30];
-    char nome[15];
-    char sobrenome[15];
+    char nome[30];
     long long cpf;
 };
 
 struct Livro
 {
-    char nome[15];
-    char sobrenome[15];
+    char nome[30];
     char titulo[30];
     int codigo;
     int ano;
@@ -63,6 +61,7 @@ void ordena_cpf(Usuario usuarios[], int qtd_usuarios)
     }
 }
 
+
 void cadastrar_usuario(Usuario usuarios[])
 {
     bool ja_tem = false;
@@ -92,23 +91,28 @@ void cadastrar_usuario(Usuario usuarios[])
                     j++;
                 }
                 else
+                {
                     printf("CPF invalido.\n");
+                }
+                    
             }
 
             for (int j = 0; j < 1;)
             {
-
+                char temp[1000];
                 printf("Nome: ");
-                scanf(" %s", usuarios[i].nome);
-                strupr(usuarios[i].nome);
-                printf("Sobrenome: ");
-                scanf(" %s", usuarios[i].sobrenome);
-                strupr(usuarios[i].sobrenome);
+                getchar();
+                gets(temp);
+                strupr(temp);
 
-                if (strlen(usuarios[i].nome) >= 4 && strlen(usuarios[i].sobrenome) >= 1)
+                if (strlen(temp) >= 4 && strlen(temp) <= 30)
+                {
+                    strcpy(usuarios[i].nome, temp);
                     j++;
+                }
+                    
                 else
-                    printf("Nome invalido.\n");
+                    printf("Erro: nome invalido.\n");
             }
 
             usuarios[i].ocupado = 1;
@@ -133,7 +137,6 @@ void listar_usuarios(Usuario usuarios[], Livro livros[])
         if (usuarios[i].ocupado == 1)
         {
             printf("\n%s", usuarios[i].nome);
-            printf(" %s", usuarios[i].sobrenome);
             printf("\n%lld\n", usuarios[i].cpf);
         }
     }
@@ -180,7 +183,7 @@ void excluir_usuario(Usuario usuarios[])
 void cadastrar_livro(Usuario usuarios[], Livro livros[])
 {
     bool ja_tem = false;
-    long long codigo_cadastrar;
+    int codigo_cadastrar;
 
     for (int i = 0; i < 100; i++)
     {
@@ -203,7 +206,6 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
                 if (codigo_cadastrar <= 999999 && ja_tem == false)
                 {
                     livros[i].codigo = codigo_cadastrar;
-                    printf("\n%d\n", livros[i].codigo);
                     j++;
                 }
                 else
@@ -212,31 +214,39 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
 
             for (int j = 0; j < 1;)
             {
-
+                char temp[1000];
                 printf("Nome do autor: ");
-                scanf(" %s", livros[i].nome);
-                strupr(livros[i].nome);
-                printf("Sobrenome do autor: ");
-                scanf(" %s", livros[i].sobrenome);
-                strupr(livros[i].sobrenome);
+                getchar();
+                gets(temp);
+                strupr(temp);
 
-                if (strlen(livros[i].nome) >= 4 && strlen(livros[i].sobrenome) >= 1)
+                if (strlen(temp) >= 4 && strlen(temp) <= 30)
+                {
+                    strcpy(livros[i].nome, temp);
                     j++;
+                }
+
                 else
-                    printf("Nome invalido.\n");
+                    printf("Erro: nome invalido.\n");
             }
 
             for (int j = 0; j < 1;)
             {
+                char temp[1000];
+                getchar();
+                printf("Titulo: ");
+                gets(temp);
+                strupr(temp);
 
-                printf("Titulo (sem espaços): ");
-                scanf(" %s", livros[i].titulo);
-                strupr(livros[i].titulo);
-
-                if (strlen(livros[i].titulo) >= 4)
+                if (strlen(temp) >= 4 && strlen(temp) <= 30)
+                {
+                    strcpy(livros[i].titulo, temp);
+                    printf("\n%s\n", livros[i].titulo);
                     j++;
-                if (strlen(livros[i].titulo) < 4)
-                    printf("Titulo invalido.\n");
+                }
+                
+                else
+                    printf("Erro: titulo invalido.\n");
             }
 
             for (int j = 0; j < 1;)
@@ -247,7 +257,7 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
                 if (livros[i].ano >= 1900 && livros[i].ano <= 2050)
                     j++;
                 else
-                    printf("Ano invalido.\n");
+                    printf("Erro: ano invalido.\n");
             }
 
             livros[i].ocupado = 1;
@@ -312,7 +322,7 @@ void listar_livros(Usuario usuarios[], Livro livros[])
         if (livros[i].ocupado == 1)
         {
             printf("\n%s\n", livros[i].titulo);
-            printf("%s %s", livros[i].nome, livros[i].sobrenome);
+            printf("%s", livros[i].nome);
             printf("\n%d\n", livros[i].codigo);
             printf("%d\n", livros[i].ano);
         }
