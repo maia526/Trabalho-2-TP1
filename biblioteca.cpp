@@ -560,7 +560,7 @@ void emprestar_livro(Usuario usuarios[], Livro livros[])
                 }
             }
         }
-        if (tem == true)
+        if (tem)
         {
             if (ja_tem_emprestimo)
             {
@@ -587,7 +587,7 @@ void emprestar_livro(Usuario usuarios[], Livro livros[])
 
 void devolve_livro(Usuario usuarios[], Livro livros[])
 {
-    int cpf_devolver;
+    long long cpf_devolver;
     bool tem = false;
     int pos_usuario, pos_livro;
     long data_devolver;
@@ -598,43 +598,41 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
     
     for (int i = 0; i < 1; )
     {
-        emprestado = true;
-        tem = false;
         printf("\nCPF: ");
-        scanf("%d", &cpf_devolver);
+        scanf("%lld", &cpf_devolver);
 
         for (int j = 0; j < 100; j++)
         {
+            tem = false;
+            emprestado = false;
             if (cpf_devolver == usuarios[j].cpf)
             {
-                tem = true;
+                tem = true; 
                 pos_usuario = j;
 
                 if (usuarios[j].tem_emprestimo == 1)
                 {
-                    codigo_entrega = usuarios[j].codigo_livro;
-
-                    for (int k = 0; k < 100; k++)
-                    {
-                        if (livros[k].codigo == codigo_entrega)
-                            pos_livro = k;
-                    }
+                    if (cpf_devolver == usuarios[j].cpf)
+                        tem = true;
+                    if (usuarios[j].tem_emprestimo = 1)
+                        emprestado = true;
                 }
-                else
-                    emprestado = false;
+                break;
             }
         }
-        if (!emprestado)
-            printf("\nErro: O usuario nao possui emprestimos em andamento.");
 
-        if (tem && emprestado)
-            i++;
-            
-        if (!tem)
+        if (tem == false)
             printf("\nErro: CPF nao consta no sistema");
+
+        if (tem == true && emprestado == false)
+                printf("\nErro: O usuario nao possui emprestimos em andamento.");    
+
+        if (tem == true && emprestado == true)
+            i++;
     }
 
-    for (int i = 0; i < 1; i++)
+
+    for (int i = 0; i < 1; )
     {
         printf("Digite a data de entrega no fomato DDMMAAAA: ");
         scanf("%ld", &data_devolver);
@@ -648,12 +646,13 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
             d.ano = anoEntrega;
             d.mes = mesEntrega;
             d.dia = diaEntrega;
-            if (eh_data_valida(d) && (maior(d, livros[pos_livro].data_emprestimo) || igual(d, livros[pos_livro].data_emprestimo)) &&
-                (menor(d, data_atual()) || igual(d, data_atual()))) // válido e maior ou igual à data de retirada e menor ou igual à data atual
+            if (eh_data_valida(d) && (maior(d, livros[pos_livro].data_emprestimo) || igual(d, livros[pos_livro].data_emprestimo)) && (menor(d, data_atual()) || igual(d, data_atual()))) // válido e maior ou igual à data de retirada e menor ou igual à data atual
                 i++;
             puts("Data invalida. Tente novamente");
         }
     }
+
+    printf("\n\nPassou o loop da data");
 }
 
 void menu_cadastro_usuarios(Usuario usuarios[], Livro livros[])
