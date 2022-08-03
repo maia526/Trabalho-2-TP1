@@ -651,7 +651,8 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
             puts("Data invalida. Tente novamente");
         }
     }
-
+    
+    //programa não está chegando nessa linha
     printf("\n\nPassou o loop da data");
 }
 
