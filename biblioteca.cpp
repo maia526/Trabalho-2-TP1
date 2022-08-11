@@ -11,7 +11,7 @@ struct Data
 
 /* Recupera a data/hora atual da máquina */
 void data_hora_atual(int &dia, int &mes, int &ano,
-                     int &hora, int &min, int &seg)
+    int &hora, int &min, int &seg)
 {
     time_t t = time(NULL);
     struct tm lt = *localtime(&t);
@@ -44,7 +44,7 @@ bool eh_bissexto(int ano)
 /* Retorna o número de dias de um mês/ano */
 int numero_dias_mes(int mes, int ano)
 {
-    int dias[] = {31, eh_bissexto(ano) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int dias[] = { 31, eh_bissexto(ano) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
     return mes >= 1 && mes <= 12 && ano > 0 ? dias[mes - 1] : -1;
 }
@@ -53,8 +53,8 @@ int numero_dias_mes(int mes, int ano)
 bool eh_data_valida(int dia, int mes, int ano)
 {
     return ano > 0 &&
-           mes >= 1 && mes <= 12 &&
-           dia >= 1 && dia <= numero_dias_mes(mes, ano);
+        mes >= 1 && mes <= 12 &&
+        dia >= 1 && dia <= numero_dias_mes(mes, ano);
 }
 
 /* Verifica se os valores de dia, mês e ano da struct Data formam uma data válida */
@@ -67,24 +67,24 @@ bool eh_data_valida(Data dt)
 bool maior(Data dt1, Data dt2)
 {
     return dt1.ano > dt2.ano ||
-           (dt1.ano == dt2.ano && dt1.mes > dt2.mes) ||
-           (dt1.ano == dt2.ano && dt1.mes == dt2.mes && dt1.dia > dt2.dia);
+        (dt1.ano == dt2.ano && dt1.mes > dt2.mes) ||
+        (dt1.ano == dt2.ano && dt1.mes == dt2.mes && dt1.dia > dt2.dia);
 }
 
 /* Verifica se dt1 é menor que dt2 */
 bool menor(Data dt1, Data dt2)
 {
     return dt1.ano < dt2.ano ||
-           (dt1.ano == dt2.ano && dt1.mes < dt2.mes) ||
-           (dt1.ano == dt2.ano && dt1.mes == dt2.mes && dt1.dia < dt2.dia);
+        (dt1.ano == dt2.ano && dt1.mes < dt2.mes) ||
+        (dt1.ano == dt2.ano && dt1.mes == dt2.mes && dt1.dia < dt2.dia);
 }
 
 /* Verifica se dt1 é igual a dt2 */
 bool igual(Data dt1, Data dt2)
 {
     return dt1.dia == dt2.dia &&
-           dt1.mes == dt2.mes &&
-           dt1.ano == dt2.ano;
+        dt1.mes == dt2.mes &&
+        dt1.ano == dt2.ano;
 }
 
 /* Retorna a data dt incrementada em UM dia */
@@ -188,6 +188,10 @@ struct Usuario
     int codigo_livro;
     char nome[30];
     long long cpf;
+    char nome_livro[30];
+    char nome_autor[30];
+    Data data_emprestimo;
+    Data data_devolucao;
 };
 
 struct Livro
@@ -198,6 +202,8 @@ struct Livro
     int ano;
     int ocupado = 0;    // todos começam com ocupado = 0. se for 1, significa que há um livro cadastrado naquela posição. se for 0 significa que aquela posição pode ser usada para cadastrar outro livro
     int emprestado = 0; //0 se não está emprestado, 1 se está
+    long long cpf;
+    char nome_usuario[30];
     Data data_emprestimo;
     Data data_devolucao;
 
@@ -270,7 +276,7 @@ void cadastrar_usuario(Usuario usuarios[])
                 }
                 else
                 {
-                    printf("CPF invalido.\n");  //se falhar em uma das duas condições acima, mensagem de erro
+                    printf("Erro: CPF ja cadastrado.\n");  //se falhar em uma das duas condições acima, mensagem de erro
                 }
             }
 
@@ -294,6 +300,7 @@ void cadastrar_usuario(Usuario usuarios[])
             }
 
             usuarios[i].ocupado = 1;    //posição é marcada como ocupada
+            printf("\nUsuario cadastrado com sucesso!\n");
 
             break;
         }
@@ -305,14 +312,27 @@ void listar_usuarios(Usuario usuarios[], Livro livros[])
     int qtd_usuarios = 0;
     ordena_cpf(usuarios, 100);
 
+    puts("--------------------------------------------------");
+    puts("CPF         Nome");
+    puts("--------------------------------------------------");
     for (int i = 0; i < 100; i++)
     {
         if (usuarios[i].ocupado == 1)
         {
-            printf("\n%s", usuarios[i].nome);
-            printf("\n%lld\n", usuarios[i].cpf);
+            if (usuarios[i].tem_emprestimo == 1)
+            {
+                printf("%lld %s\n", usuarios[i].cpf, usuarios[i].nome);
+                printf("\tEmprestimo: %d/%d/%d\n", usuarios[i].data_emprestimo.dia, usuarios[i].data_emprestimo.mes, usuarios[i].data_emprestimo.ano);
+                printf("\tTitulo: %s\n", usuarios[i].nome_livro);
+                printf("\tAutor: %s\n", usuarios[i].nome_autor);
+            }
+            else
+                printf("%lld %s\n", usuarios[i].cpf, usuarios[i].nome);
         }
+            
+
     }
+    puts("--------------------------------------------------");
 }
 
 void excluir_usuario(Usuario usuarios[])
@@ -365,7 +385,7 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
         //achar posição livre
         if (livros[i].ocupado == 0)
         {
-            for (int j = 0; j < 1;)
+            for (;;)
             {
                 ja_tem = false;
                 printf("Codigo: ");
@@ -382,36 +402,19 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
                 }
                 //verifica se código tem até 6 dígitos e não existe no sistema
                 if (codigo_cadastrar <= 999999 && ja_tem == false)
-                {   
+                {
                     //se sim, atribui à struct na posição livre
                     livros[i].codigo = codigo_cadastrar;
-                    j++;
+                    break;
                 }
                 else
-                    printf("Codigo invalido.\n");
+                    printf("Erro: Livro ja cadastrado.\n");
             }
 
             //le nome
-            for (int j = 0; j < 1;)
+            for (;;)
             {
-                char temp[1000];
-                getchar();
-                gets(temp);
-                strupr(temp);
-
-                if (strlen(temp) >= 4 && strlen(temp) <= 30)
-                {
-                    strcpy(livros[i].nome, temp);
-                    j++;
-                }
-
-                else
-                    printf("Erro: nome invalido.\n");
-            }
-
-            //le titulo
-            for (int j = 0; j < 1;)
-            {
+                fflush(stdin);
                 char temp[1000];
                 printf("Titulo: ");
                 gets(temp);
@@ -419,9 +422,27 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
 
                 if (strlen(temp) >= 4 && strlen(temp) <= 30)
                 {
+                    strcpy(livros[i].nome, temp);
+                    break;
+                }
+
+                else
+                    printf("Erro: nome invalido.\n");
+            }
+
+            //le titulo
+            for (;;)
+            {
+                fflush(stdin);
+                char temp[1000];
+                printf("Autor: ");
+                gets(temp);
+                strupr(temp);
+
+                if (strlen(temp) >= 4 && strlen(temp) <= 30)
+                {
                     strcpy(livros[i].titulo, temp);
-                    printf("\n%s\n", livros[i].titulo);
-                    j++;
+                    break;
                 }
 
                 else
@@ -429,18 +450,19 @@ void cadastrar_livro(Usuario usuarios[], Livro livros[])
             }
 
             //le ano de publicação
-            for (int j = 0; j < 1;)
+            for (;;)
             {
                 printf("Ano de publicacao: ");
                 scanf("%d", &livros[i].ano);
 
                 if (livros[i].ano >= 1900 && livros[i].ano <= 2050)
-                    j++;
+                    break;
                 else
                     printf("Erro: ano invalido.\n");
             }
 
             livros[i].ocupado = 1;  //marca posição como ocupada
+            printf("\nLivro cadastrado com sucesso!\n");
 
             break;
         }
@@ -475,6 +497,7 @@ void excluir_livro(Usuario usuarios[], Livro livros[])
     if (tem && !emprestado) //se existe e não está emprestado, marca posição como ocupada
     {
         livros[pos].ocupado = 0;
+        printf("\nExclusao realizada com sucesso!\n");
     }
 }
 
@@ -483,16 +506,46 @@ void listar_livros(Usuario usuarios[], Livro livros[])
     int qtd_livros = 0;
     ordena_titulo(livros, 100);
 
+    puts("-------------------------------------------------------------------------");
+    puts("Codigo Titulo                         Autor                           Ano");
+    puts("-------------------------------------------------------------------------");
     for (int i = 0; i < 100; i++)
     {
         if (livros[i].ocupado == 1)
         {
-            printf("\n%s\n", livros[i].titulo);
-            printf("%s", livros[i].nome);
-            printf("\n%d\n", livros[i].codigo);
-            printf("%d\n", livros[i].ano);
+            if (livros[i].emprestado == 1)
+            {
+                printf("%d ", livros[i].codigo);
+                printf("%s", livros[i].titulo);
+                for (int j = 0; j < 31 - strlen(livros[i].titulo); j++)
+                    printf(" ");
+                printf("%s", livros[i].nome);
+                for (int j = 0; j < 31 - strlen(livros[i].nome); j++)
+                    printf(" ");
+                printf("%d\n", livros[i].ano);
+
+                printf("\tEmprestimo: %d/%d/%d\n", livros[i].data_emprestimo.dia, livros[i].data_emprestimo.mes, livros[i].data_emprestimo.ano);
+                printf("\tDevolucao: %d/%d/%d\n", livros[i].data_devolucao.dia, livros[i].data_devolucao.mes, livros[i].data_devolucao.ano);
+                printf("\tCPF: %lld\n", livros[i].cpf);
+                printf("\tNome: %s", livros[i].nome_usuario);
+            }
+
+            else
+            {
+                printf("%d ", livros[i].codigo);
+                printf("%s", livros[i].titulo);
+                for (int j = 0; j < 31 - strlen(livros[i].titulo); j++)
+                    printf(" ");
+                printf("%s", livros[i].nome);
+                for (int j = 0; j < 31 - strlen(livros[i].nome); j++)
+                    printf(" ");
+                printf("%d\n", livros[i].ano);
+            
+            } 
         }
     }
+    puts("-----------------------------------------------------------------------");
+
 }
 
 void emprestar_livro(Usuario usuarios[], Livro livros[])
@@ -519,7 +572,7 @@ void emprestar_livro(Usuario usuarios[], Livro livros[])
                 {
                     tem = true;
                     pos_usuario = j;
-                    
+
                     //verifica se usuário tem empréstimo registrado
                     if (usuarios[j].tem_emprestimo == 1)
                         ja_tem_emprestimo = true;
@@ -531,13 +584,13 @@ void emprestar_livro(Usuario usuarios[], Livro livros[])
             //se existe e tem empréstimo
             if (ja_tem_emprestimo)
             {
-                printf("\nErro: Usuario ja tem um emprestimo em andamento.");
+                printf("\nErro: CPF ja possui emprestimo!");
             }
             else
                 i++;
         }
         else    //se não existe
-            printf("\nErro: CPF nao consta no sistema.");
+            printf("\nErro: CPF nao cadastrado!");
     }
 
     tem = false;
@@ -571,21 +624,26 @@ void emprestar_livro(Usuario usuarios[], Livro livros[])
         {
             if (ja_tem_emprestimo)
             {
-                printf("\nErro: Este livro ja esta emprestado.");
+                printf("\nErro: Livro ja esta emprestado.");
             }
             else
                 i++;
         }
         else
-            printf("\nErro: Codigo nao consta no sistema.");
+            printf("\nErro: Livro nao cadastrado.");
     }
 
     //marca usuário como tendo empréstimo
     usuarios[pos_usuario].tem_emprestimo = 1;
     //atribui codigo do livro ao usuário
     usuarios[pos_usuario].codigo_livro = livros[pos_livro].codigo;
+    strcpy(usuarios[pos_usuario].nome_livro, livros[pos_livro].titulo);
+    strcpy(usuarios[pos_livro].nome_autor, livros[pos_livro].nome);
     //marca livro como emprestado
     livros[pos_livro].emprestado = 1;
+
+    livros[pos_livro].cpf = usuarios[pos_usuario].cpf;
+    strcpy(livros[pos_livro].nome_usuario, usuarios[pos_usuario].nome);
 
     //gera data da entrega
     Data dataEntrega = incrementa(data_atual(), 7);
@@ -594,34 +652,49 @@ void emprestar_livro(Usuario usuarios[], Livro livros[])
     //atribui data da entrega para o livro
     livros[pos_livro].data_devolucao = dataEntrega;
 
+    usuarios[pos_usuario].data_emprestimo = data_atual();
+    //atribui data da entrega para o livro
+    usuarios[pos_usuario].data_devolucao = dataEntrega;
+
     // printf("Data do emprestimo: %d/%d/%d\n", livros[pos_livro].data_emprestimo.dia, livros[pos_livro].data_emprestimo.mes, livros[pos_livro].data_emprestimo.ano);
     // printf("Data da devolucao: %d/%d/%d\n", livros[pos_livro].data_devolucao.dia, livros[pos_livro].data_devolucao.mes, livros[pos_livro].data_devolucao.ano);
+
+    printf("\nEmpresitmo concedido!\n");
+    printf("Nome: %s", livros[pos_livro].nome);
+    printf("\nTitulo: %s", livros[pos_livro].titulo);
+    printf("\nData emprestimo: %d/%d/%d\n", livros[pos_livro].data_emprestimo.dia, livros[pos_livro].data_emprestimo.mes, livros[pos_livro].data_emprestimo.ano);
+    printf("Data devolucao: %d/%d/%d\n", livros[pos_livro].data_devolucao.dia, livros[pos_livro].data_devolucao.mes, livros[pos_livro].data_devolucao.ano);
+
+
 }
 
 Data leDataEntrega(Livro livros[], Usuario usuarios[], long long cpfUsuario, int pos_usuario, int pos_livro)
 {
-    long input;
+    //milton, essa função não tá funcionando direito, falta ajeitar ela, fazer a função de listar empréstimos e formatar o printf das outras funções de listagem 
+    int input;
     int diaEntrega, mesEntrega, anoEntrega;
     Data d;
     Usuario usuario = usuarios[pos_usuario];
     while (true)
     {
         printf("Digite a data de entrega no fomato DDMMAAAA: ");
-        scanf("%ld", &input);
+        scanf("%d", &input);
         if (input > 99999999 || input < 1000000)
             printf("Digite no formato DDMMAAAA\n");
         else
         {
             anoEntrega = input % 10000;
-            mesEntrega = ((int)input / 10000) % 100;
-            diaEntrega = (int)input / 1000000;
+            mesEntrega = (input /= 10000) % 100;
+            diaEntrega = (input /= 100);
             d.ano = anoEntrega;
             d.mes = mesEntrega;
             d.dia = diaEntrega;
-            if (eh_data_valida(d) && (maior(d, livros[pos_livro].data_emprestimo) || igual(d, livros[pos_livro].data_emprestimo)) &&
+            if (eh_data_valida(d) &&
+                (maior(d, livros[pos_livro].data_emprestimo) ||
+                    igual(d, livros[pos_livro].data_emprestimo)) &&
                 (menor(d, data_atual()) || igual(d, data_atual()))) // válido e maior ou igual à data de retirada e menor ou igual à data atual
                 break;
-            puts("Data invalida. Tente novamente");
+            puts("Erro: Data de devolucao invalida!");
         }
     }
     return d;
@@ -636,7 +709,7 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
     Data d;
     int diaEntrega, mesEntrega, anoEntrega;
     bool emprestado = true;
-    
+
 
     //ler o cpf
     for (int i = 0; i < 1; )
@@ -650,7 +723,7 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
             emprestado = false;
             if (cpf_devolver == usuarios[j].cpf)    //verifica se cpf esta cadastrado
             {
-                tem = true; 
+                tem = true;
                 pos_usuario = j;    //registra a posição do usuario no vetor
 
                 if (usuarios[j].tem_emprestimo == 1)    //verifica se tem emprestimo registrado no cpf
@@ -663,10 +736,10 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
         }
 
         if (tem == false)
-            printf("\nErro: CPF nao consta no sistema");
+            printf("\nErro: Usuario nao cadastrado!");
 
         if (tem == true && emprestado == false)
-                printf("\nErro: O usuario nao possui emprestimos em andamento.");    
+            printf("\nErro: O usuario nao tem emprestimo!");
 
         if (tem == true && emprestado == true)
             i++;
@@ -694,9 +767,27 @@ void devolve_livro(Usuario usuarios[], Livro livros[])
     else
         printf("com atraso de %d dia(s)!\n", diferenca(livros[pos_livro].data_devolucao, data));    //se a fata de entrega for maior
 
-    //programa não está chegando nessa linha
-    printf("\n\nPassou o loop da data");    
+    printf("Nome: %s", usuarios[pos_usuario].nome);
+    printf("\nTitulo: %s", livros[pos_livro].titulo);
 }
+
+void listar_emprestimos(Livro livros[], Usuario usuarios[])
+{
+    int qtd_usuarios = 0;
+    ordena_cpf(usuarios, 100);
+
+    puts("-------------------------------------------------------------");
+    puts("CPF         Nome       Codigo      Titulo   Emprestimo    Devolucao");
+    puts("------------------------------------------------------------");
+    for (int i = 0; i < 100; i++)
+    {
+        if (usuarios[i].ocupado == 1 && usuarios[i].tem_emprestimo == 1)
+            printf("%lld %s %d %s  %d/%d/%d  %d/%d/%d\n", usuarios[i].cpf, usuarios[i].nome, usuarios[i].codigo_livro, usuarios[i].nome_livro, usuarios[i].data_emprestimo.dia, usuarios[i].data_emprestimo.mes, usuarios[i].data_emprestimo.ano, usuarios[i].data_devolucao.dia, usuarios[i].data_devolucao.mes, usuarios[i].data_devolucao.ano);
+
+    }
+    puts("--------------------------------------------------");
+}
+
 
 void menu_cadastro_usuarios(Usuario usuarios[], Livro livros[])
 {
@@ -760,8 +851,8 @@ void menu_cadastro_emprestimo_devolucao(Usuario usuarios[], Livro livros[])
             emprestar_livro(usuarios, livros);
         if (entrada == 2)
             devolve_livro(usuarios, livros);
-        //  if (entrada == 3)
-        //      listar_emprestimos();
+        if (entrada == 3)
+            listar_emprestimos(livros, usuarios);
         if (entrada == 4)
             break;
     }
